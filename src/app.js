@@ -5,6 +5,7 @@
 
 import { CHARACTERS } from './data/characters.js';
 import { QUESTIONS } from './data/questions.js';
+import heroImg from './assets/images/snk_quiz_hero_1792430580367.jpg';
 
 class SnkQuizApp {
   constructor() {
@@ -13,6 +14,7 @@ class SnkQuizApp {
     this.answers = []; // Array de { questionId, optionIndex, scores }
     this.soundEnabled = true;
     this.audioCtx = null;
+    this.selectedModalCharacter = null;
 
     // Elementos del DOM
     this.appRoot = document.getElementById('app-root');
@@ -59,7 +61,7 @@ class SnkQuizApp {
       osc.start();
       osc.stop(this.audioCtx.currentTime + duration);
     } catch {
-      // Silenciar si hay políticas de audio
+      // Ignorar restricciones del navegador si no ha habido interacción previa
     }
   }
 
@@ -74,7 +76,7 @@ class SnkQuizApp {
 
   playVictorySound() {
     if (!this.soundEnabled || !this.audioCtx) return;
-    const notes = [392, 523.25, 659.25, 783.99]; // Acorde heroico en Sol/Do
+    const notes = [392, 523.25, 659.25, 783.99]; // Acorde heroico en Sol mayor
     notes.forEach((note, idx) => {
       setTimeout(() => this.playTone(note, 'triangle', 0.35, 0.06), idx * 110);
     });
@@ -110,8 +112,13 @@ class SnkQuizApp {
       this.soundToggleBtn.addEventListener('click', () => this.toggleSound());
     }
 
-    // Atajos de teclado para opciones (1-4 y A-D)
+    // Atajos de teclado para opciones (1-4 y A-D) y Escape para modal
     window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.selectedModalCharacter) {
+        this.closeCharacterModal();
+        return;
+      }
+
       if (this.currentStep !== 'QUIZ') return;
       const key = e.key.toUpperCase();
       let selectedIdx = -1;
@@ -132,6 +139,7 @@ class SnkQuizApp {
     this.currentIndex = 0;
     this.answers = [];
     this.render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   selectOption(optionIndex) {
@@ -145,7 +153,6 @@ class SnkQuizApp {
       scores: selectedOption.scores
     };
 
-    // Pequeño retardo de feedback visual para suavidad de transición
     setTimeout(() => {
       if (this.currentIndex < QUESTIONS.length - 1) {
         this.currentIndex++;
@@ -178,14 +185,27 @@ class SnkQuizApp {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  openCharacterModal(charId) {
+    const char = CHARACTERS.find(c => c.id === charId);
+    if (!char) return;
+    this.selectedModalCharacter = char;
+    this.renderModal();
+  }
+
+  closeCharacterModal() {
+    this.selectedModalCharacter = null;
+    const modalEl = document.getElementById('character-modal');
+    if (modalEl) {
+      modalEl.remove();
+    }
+  }
+
   calculateAffinities() {
-    // Inicializar acumulador de puntuación para cada personaje
     const scores = {};
     CHARACTERS.forEach(char => {
       scores[char.id] = 0;
     });
 
-    // Sumar todos los puntos obtenidos en las respuestas
     this.answers.forEach(ans => {
       if (!ans || !ans.scores) return;
       Object.entries(ans.scores).forEach(([charId, val]) => {
@@ -195,15 +215,11 @@ class SnkQuizApp {
       });
     });
 
-    // Calcular puntaje total asignado
-    const totalScore = Object.values(scores).reduce((acc, curr) => acc + curr, 0) || 1;
     const maxScore = Math.max(...Object.values(scores), 1);
 
-    // Mapear con porcentajes normalizados
     const sortedList = CHARACTERS.map(char => {
       const raw = scores[char.id] || 0;
-      // Porcentaje relativo al puntaje máximo obtenido (el líder alcanza ~95%-98%)
-      const percentage = Math.min(98, Math.max(18, Math.round((raw / maxScore) * 94) + 4));
+      const percentage = Math.min(98, Math.max(22, Math.round((raw / maxScore) * 94) + 4));
       return {
         character: char,
         rawScore: raw,
@@ -236,20 +252,22 @@ class SnkQuizApp {
 
   /* ------------------- PANTALLA 1: BIENVENIDA ------------------- */
   renderWelcomeScreen() {
+    const heroBg = heroImg || '/images/hero.jpg';
+
     return `
-      <div class="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-fade-in">
+      <div class="max-w-6xl mx-auto px-4 py-8 md:py-12 animate-fade-in">
         <!-- Hero Card con imagen de fondo cinematográfica -->
-        <div class="relative overflow-hidden rounded-2xl snk-card border border-amber-500/30">
-          <div class="relative h-64 sm:h-80 md:h-96 w-full overflow-hidden">
+        <div class="relative overflow-hidden rounded-2xl snk-card border border-amber-500/30 mb-12">
+          <div class="relative h-72 sm:h-96 md:h-[420px] w-full overflow-hidden">
             <img 
-              src="/src/assets/images/snk_quiz_hero_1792430580367.jpg" 
+              src="${heroBg}" 
+              onerror="this.onerror=null; this.src='/images/hero.jpg';"
               alt="Cuerpo de Exploración - Alas de la Libertad" 
               class="w-full h-full object-cover object-center filter brightness-90 contrast-110"
               loading="eager"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-[#0d1117]/60 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#0d1117] via-[#0d1117]/65 to-transparent"></div>
             
-            <!-- Emblema de la Legión -->
             <div class="absolute top-6 left-6 flex items-center gap-2">
               <span class="text-xs uppercase tracking-widest text-amber-400 font-semibold font-cinzel">
                 División Militar · Paradis
@@ -258,20 +276,20 @@ class SnkQuizApp {
           </div>
 
           <!-- Contenido central de presentación -->
-          <div class="p-6 sm:p-8 md:p-10 -mt-16 sm:-mt-20 relative z-10 text-center">
-            <h1 class="font-cinzel text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight mb-4 text-balance">
+          <div class="p-6 sm:p-10 -mt-20 sm:-mt-24 relative z-10 text-center">
+            <h1 class="font-cinzel text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight mb-4 text-balance">
               ¿Qué personaje de <span class="text-gold-gradient">Attack on Titan</span> sos?
             </h1>
             
-            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
+            <p class="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-6">
               Enfrenta 10 situaciones críticas de combate, dilemas morales y decisiones tácticas dentro y fuera de las Murallas para revelar tu afinidad psicológica militar.
             </p>
 
-            <!-- Datos técnicos del test en formato unboxed -->
+            <!-- Datos técnicos del test -->
             <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-400 mb-8 border-y border-amber-500/20 py-3 max-w-xl mx-auto">
               <span>10 Preguntas Tácticas</span>
               <span aria-hidden="true" class="text-amber-500/50">·</span>
-              <span>8 Perfiles Psicológicos</span>
+              <span>8 Perfiles de Soldados</span>
               <span aria-hidden="true" class="text-amber-500/50">·</span>
               <span>Cálculo Multidimensional</span>
               <span aria-hidden="true" class="text-amber-500/50">·</span>
@@ -282,7 +300,7 @@ class SnkQuizApp {
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
                 id="btn-start-quiz" 
-                class="w-full sm:w-auto px-8 py-3.5 rounded-xl font-cinzel font-bold text-base btn-primary tracking-wide flex items-center justify-center gap-2 group cursor-pointer"
+                class="w-full sm:w-auto px-10 py-4 rounded-xl font-cinzel font-bold text-base sm:text-lg btn-primary tracking-wider flex items-center justify-center gap-3 group cursor-pointer shadow-xl shadow-green-950/40"
               >
                 <span>Entregar mi Corazón (Comenzar)</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
@@ -293,23 +311,63 @@ class SnkQuizApp {
           </div>
         </div>
 
-        <!-- Muestra previa de los soldados a descubrir -->
-        <div class="mt-12 text-center">
-          <h2 class="font-cinzel text-sm sm:text-base tracking-widest text-slate-400 uppercase mb-6">
-            Personajes analizables en la evaluación
-          </h2>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Galería Destacada de Personajes (Imágenes Grandes y Visibles) -->
+        <div class="mt-8">
+          <div class="flex items-center justify-between mb-6 pb-2 border-b border-amber-500/20">
+            <div>
+              <h2 class="font-cinzel text-xl sm:text-2xl font-bold text-white">
+                Personajes Analizables en la Evaluación
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                Haz clic en cualquier tarjeta para ver su biografía, lema y estilo de combate
+              </p>
+            </div>
+            <span class="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">
+              8 SOLDADOS
+            </span>
+          </div>
+
+          <!-- Cuadrícula con imágenes grandes y claras de cada personaje -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
             ${CHARACTERS.map(c => `
-              <div class="snk-card p-3 rounded-xl flex items-center gap-3 border border-slate-800 hover:border-amber-500/40 transition-colors">
-                <img 
-                  src="${c.image}" 
-                  alt="${c.name}" 
-                  class="w-12 h-12 rounded-lg object-cover shrink-0 border border-slate-700" 
-                  loading="lazy"
-                />
-                <div class="text-left min-w-0">
-                  <p class="text-sm font-semibold text-slate-200 truncate">${c.name}</p>
-                  <p class="text-xs text-slate-400 truncate">${c.japaneseName}</p>
+              <div 
+                class="character-card group snk-card rounded-xl overflow-hidden border border-slate-700 hover:border-amber-500/70 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/10 flex flex-col"
+                data-char-id="${c.id}"
+                tabindex="0"
+                role="button"
+                aria-label="Ver perfil de ${c.name}"
+              >
+                <!-- Contenedor del retrato -->
+                <div class="relative aspect-square w-full bg-slate-900 overflow-hidden">
+                  <img 
+                    src="${c.image}" 
+                    onerror="this.onerror=null; this.src='${c.fallbackImage}';"
+                    alt="${c.name} - Retrato oficial" 
+                    class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105 filter brightness-95 contrast-105"
+                    loading="lazy"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-[#151b23] via-transparent to-transparent opacity-80"></div>
+                  
+                  <!-- Kanji japonés sutil en esquina superior -->
+                  <div class="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-[11px] text-amber-300 font-cinzel">
+                    ${c.japaneseName}
+                  </div>
+                </div>
+
+                <!-- Info inferior -->
+                <div class="p-3.5 sm:p-4 flex-1 flex flex-col justify-between bg-[#151b23]">
+                  <div>
+                    <h3 class="font-cinzel font-bold text-sm sm:text-base text-white group-hover:text-amber-400 transition-colors">
+                      ${c.name}
+                    </h3>
+                    <p class="text-xs text-amber-500/90 font-medium truncate mt-0.5">
+                      ${c.title}
+                    </p>
+                  </div>
+                  <div class="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+                    <span class="truncate max-w-[130px]">${c.division.split('·')[0].trim()}</span>
+                    <span class="text-amber-400 group-hover:translate-x-0.5 transition-transform">Ver ficha →</span>
+                  </div>
                 </div>
               </div>
             `).join('')}
@@ -324,6 +382,18 @@ class SnkQuizApp {
     if (startBtn) {
       startBtn.addEventListener('click', () => this.startQuiz());
     }
+
+    const charCards = document.querySelectorAll('.character-card');
+    charCards.forEach(card => {
+      const id = card.getAttribute('data-char-id');
+      card.addEventListener('click', () => this.openCharacterModal(id));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.openCharacterModal(id);
+        }
+      });
+    });
   }
 
   /* ------------------- PANTALLA 2: PREGUNTAS ------------------- */
@@ -343,7 +413,7 @@ class SnkQuizApp {
             </span>
             <span class="text-slate-400 font-mono tabular-nums">${progressPercent}% COMPLETADO</span>
           </div>
-          <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700/60">
+          <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700/60">
             <div class="progress-bar-fill h-full rounded-full" style="width: ${progressPercent}%;"></div>
           </div>
         </div>
@@ -374,7 +444,7 @@ class SnkQuizApp {
                   role="button"
                   aria-pressed="${isSelected}"
                 >
-                  <div class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 font-cinzel font-bold text-sm text-amber-400">
+                  <div class="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 font-cinzel font-bold text-sm text-amber-400 shadow-inner">
                     ${opt.letter}
                   </div>
                   <div class="flex-1 text-left">
@@ -432,11 +502,10 @@ class SnkQuizApp {
   renderResultScreen(affinities) {
     const top = affinities.top.character;
     const topPercentage = affinities.top.percentage;
-    const runnerUps = affinities.runnerUps;
 
     return `
       <div class="max-w-4xl mx-auto px-4 py-8 md:py-12 animate-fade-in">
-        <!-- Encabezado de resultado con título militar -->
+        <!-- Encabezado militar -->
         <div class="text-center mb-8">
           <span class="text-xs uppercase tracking-widest text-amber-400 font-bold font-cinzel">
             INFORME DE EVALUACIÓN MILITAR
@@ -449,39 +518,39 @@ class SnkQuizApp {
           </p>
         </div>
 
-        <!-- Tarjeta Principal del Personaje -->
-        <div class="snk-card rounded-2xl overflow-hidden border border-amber-500/40 mb-8">
+        <!-- Tarjeta Principal del Personaje (Imagen Gigante en Alta Definición) -->
+        <div class="snk-card rounded-2xl overflow-hidden border border-amber-500/40 mb-10 shadow-2xl shadow-black/80">
           <div class="grid grid-cols-1 md:grid-cols-12 items-stretch">
-            <!-- Columna Izquierda: Retrato de alta fidelidad -->
-            <div class="md:col-span-5 relative bg-slate-900 overflow-hidden flex items-center justify-center min-h-[320px] md:min-h-full">
+            <!-- Retrato de personaje en alta resolución -->
+            <div class="md:col-span-5 relative bg-slate-950 overflow-hidden flex items-center justify-center min-h-[360px] md:min-h-full">
               <img 
                 src="${top.image}" 
-                alt="${top.name}" 
+                onerror="this.onerror=null; this.src='${top.fallbackImage}';"
+                alt="Retrato oficial de ${top.name}" 
                 class="w-full h-full object-cover object-top filter brightness-95 contrast-105"
                 loading="eager"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-[#151b23] via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#151b23]"></div>
               
-              <!-- Badge flotante de afinidad -->
-              <div class="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-lg border border-amber-500/40">
-                <span class="font-mono tabular-nums text-lg font-bold text-amber-400">${topPercentage}%</span>
-                <span class="text-xs text-slate-300 ml-1">afinidad</span>
+              <!-- Badge de afinidad -->
+              <div class="absolute top-4 left-4 bg-black/85 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-amber-500/50 shadow-lg">
+                <span class="font-mono tabular-nums text-xl font-bold text-amber-400">${topPercentage}%</span>
+                <span class="text-xs text-slate-300 ml-1.5 font-medium">afinidad</span>
               </div>
             </div>
 
-            <!-- Columna Derecha: Detalles del perfil -->
-            <div class="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
+            <!-- Detalles del soldado -->
+            <div class="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between bg-[#151b23]">
               <div>
                 <div class="flex items-center justify-between gap-4 mb-2">
                   <h2 class="font-cinzel text-2xl sm:text-3xl font-black text-white">
                     ${top.name}
                   </h2>
-                  <span class="text-sm text-slate-400 font-light tracking-wide font-cinzel">
+                  <span class="text-base text-slate-400 font-cinzel">
                     ${top.japaneseName}
                   </span>
                 </div>
 
-                <!-- Título y división militar -->
                 <p class="text-amber-400 font-medium text-sm mb-1">
                   ${top.title}
                 </p>
@@ -489,17 +558,14 @@ class SnkQuizApp {
                   ${top.division}
                 </p>
 
-                <!-- Frase célebre en estilo pergamino -->
-                <blockquote class="italic text-slate-200 text-sm sm:text-base border-l-2 border-amber-500/80 pl-4 py-1.5 my-4 bg-amber-500/5 rounded-r">
+                <blockquote class="italic text-slate-200 text-sm sm:text-base border-l-2 border-amber-500/80 pl-4 py-2 my-4 bg-amber-500/5 rounded-r">
                   ${top.quote}
                 </blockquote>
 
-                <!-- Descripción de personalidad -->
                 <p class="text-slate-300 text-sm sm:text-base leading-relaxed mt-4 mb-6">
                   ${top.description}
                 </p>
 
-                <!-- Rasgos de personalidad clave -->
                 <div class="mb-4">
                   <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2">
                     Rasgos distintivos
@@ -513,7 +579,6 @@ class SnkQuizApp {
                   </div>
                 </div>
 
-                <!-- Estilo de combate -->
                 <div class="pt-4 border-t border-slate-800 text-xs text-slate-400">
                   <span class="font-semibold text-slate-300">Estilo de combate:</span> ${top.combatStyle}
                 </div>
@@ -522,10 +587,10 @@ class SnkQuizApp {
           </div>
         </div>
 
-        <!-- Desglose de afinidad con otros soldados -->
-        <div class="snk-card rounded-2xl p-6 sm:p-8 border border-slate-800 mb-8">
-          <h3 class="font-cinzel text-lg font-bold text-white mb-2">
-            Tu afinidad con el resto del Escuadrón
+        <!-- Desglose de afinidad con TODOS los personajes y sus fotos -->
+        <div class="snk-card rounded-2xl p-6 sm:p-8 border border-slate-800 mb-10">
+          <h3 class="font-cinzel text-lg sm:text-xl font-bold text-white mb-2">
+            Tu Afinidad con los 8 Soldados del Escuadrón
           </h3>
           <p class="text-xs sm:text-sm text-slate-400 mb-6">
             Puntuación calculada en base a las tácticas y valores expresados en tus respuestas:
@@ -533,30 +598,42 @@ class SnkQuizApp {
 
           <div class="space-y-4">
             ${affinities.all.map((item, idx) => `
-              <div>
-                <div class="flex items-center justify-between text-xs sm:text-sm mb-1.5">
-                  <span class="font-medium text-slate-300 flex items-center gap-2">
-                    <span class="w-5 text-slate-500 font-mono">#${idx + 1}</span>
-                    <span>${item.character.name}</span>
-                  </span>
-                  <span class="font-mono tabular-nums text-slate-400 font-semibold">${item.percentage}%</span>
-                </div>
-                <div class="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden">
-                  <div 
-                    class="h-full rounded-full transition-all duration-500" 
-                    style="width: ${item.percentage}%; background-color: ${idx === 0 ? '#c69234' : '#1d7344'};"
-                  ></div>
+              <div class="flex items-center gap-3.5 p-2 rounded-xl hover:bg-slate-800/40 transition-colors">
+                <!-- Miniatura del personaje con imagen real -->
+                <img 
+                  src="${item.character.image}" 
+                  onerror="this.onerror=null; this.src='${item.character.fallbackImage}';"
+                  alt="${item.character.name}"
+                  class="w-12 h-12 rounded-lg object-cover border border-slate-700 shrink-0" 
+                  loading="lazy"
+                />
+
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between text-xs sm:text-sm mb-1.5">
+                    <span class="font-medium text-slate-200 truncate">
+                      <span class="text-slate-500 font-mono text-xs mr-1.5">#${idx + 1}</span>
+                      <span class="font-semibold">${item.character.name}</span>
+                      <span class="text-slate-400 text-xs hidden sm:inline-block ml-1.5">(${item.character.title})</span>
+                    </span>
+                    <span class="font-mono tabular-nums text-slate-300 font-bold ml-2">${item.percentage}%</span>
+                  </div>
+                  <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700/50">
+                    <div 
+                      class="h-full rounded-full transition-all duration-500" 
+                      style="width: ${item.percentage}%; background-color: ${idx === 0 ? '#c69234' : '#1d7344'};"
+                    ></div>
+                  </div>
                 </div>
               </div>
             `).join('')}
           </div>
         </div>
 
-        <!-- Botones de Acción: Reintentar y Compartir -->
+        <!-- Botones de Acción -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button 
             id="btn-restart-quiz" 
-            class="w-full sm:w-auto px-6 py-3 rounded-xl font-cinzel font-bold text-sm btn-primary cursor-pointer flex items-center justify-center gap-2"
+            class="w-full sm:w-auto px-6 py-3.5 rounded-xl font-cinzel font-bold text-sm btn-primary cursor-pointer flex items-center justify-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
@@ -566,7 +643,7 @@ class SnkQuizApp {
 
           <button 
             id="btn-copy-result" 
-            class="w-full sm:w-auto px-5 py-3 rounded-xl text-sm btn-secondary cursor-pointer flex items-center justify-center gap-2"
+            class="w-full sm:w-auto px-5 py-3.5 rounded-xl text-sm btn-secondary cursor-pointer flex items-center justify-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
               <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
@@ -575,13 +652,12 @@ class SnkQuizApp {
             <span id="copy-btn-text">Copiar Resultado</span>
           </button>
 
-          <!-- Compartir en X / Twitter -->
           <a 
             id="share-x-link" 
             href="#" 
             target="_blank" 
             rel="noopener noreferrer" 
-            class="w-full sm:w-auto px-5 py-3 rounded-xl text-sm btn-secondary cursor-pointer flex items-center justify-center gap-2"
+            class="w-full sm:w-auto px-5 py-3.5 rounded-xl text-sm btn-secondary cursor-pointer flex items-center justify-center gap-2"
           >
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
@@ -589,13 +665,12 @@ class SnkQuizApp {
             <span>Compartir en X</span>
           </a>
 
-          <!-- Compartir en WhatsApp -->
           <a 
             id="share-wa-link" 
             href="#" 
             target="_blank" 
             rel="noopener noreferrer" 
-            class="w-full sm:w-auto px-5 py-3 rounded-xl text-sm btn-secondary cursor-pointer flex items-center justify-center gap-2"
+            class="w-full sm:w-auto px-5 py-3.5 rounded-xl text-sm btn-secondary cursor-pointer flex items-center justify-center gap-2"
           >
             <svg class="w-4 h-4 fill-current text-emerald-400" viewBox="0 0 24 24">
               <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.668-.699c.966.541 1.782.88 2.792.88 3.183 0 5.768-2.587 5.768-5.766.001-3.187-2.575-5.77-5.768-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.007c.107.005.25.002.368.28.144.341.491 1.198.535 1.285.044.087.073.189.014.305-.058.116-.087.189-.174.289-.087.101-.184.226-.263.303-.09.088-.184.184-.079.365.105.181.467.77 1.002 1.246.689.614 1.269.805 1.45.892.181.087.289.073.397-.052.108-.124.462-.536.586-.72.124-.184.248-.154.417-.091.17.063 1.077.507 1.262.6.185.093.308.139.353.217.045.078.045.452-.099.857z"/>
@@ -605,6 +680,87 @@ class SnkQuizApp {
         </div>
       </div>
     `;
+  }
+
+  renderModal() {
+    if (!this.selectedModalCharacter) return;
+    const c = this.selectedModalCharacter;
+
+    // Remover modal previo si existe
+    const existing = document.getElementById('character-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'character-modal';
+    modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in';
+    modal.innerHTML = `
+      <div class="relative w-full max-w-2xl bg-[#151b23] border border-amber-500/50 rounded-2xl overflow-hidden shadow-2xl">
+        <!-- Botón de cierre -->
+        <button 
+          id="btn-close-modal" 
+          aria-label="Cerrar modal"
+          class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/70 border border-slate-700 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer"
+        >
+          ✕
+        </button>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12">
+          <!-- Retrato grande del personaje en el modal -->
+          <div class="sm:col-span-5 relative bg-slate-950 aspect-square sm:aspect-auto">
+            <img 
+              src="${c.image}" 
+              onerror="this.onerror=null; this.src='${c.fallbackImage}';"
+              alt="${c.name}" 
+              class="w-full h-full object-cover object-top"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-[#151b23] via-transparent to-transparent sm:hidden"></div>
+          </div>
+
+          <div class="sm:col-span-7 p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-cinzel text-2xl font-bold text-white">${c.name}</h3>
+                <span class="text-sm text-slate-400 font-cinzel">${c.japaneseName}</span>
+              </div>
+              <p class="text-xs text-amber-400 font-semibold mb-1">${c.title}</p>
+              <p class="text-xs text-slate-400 mb-4">${c.division}</p>
+
+              <blockquote class="italic text-xs text-slate-200 border-l-2 border-amber-500 pl-3 py-1 bg-amber-500/10 mb-4">
+                ${c.quote}
+              </blockquote>
+
+              <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                ${c.description}
+              </p>
+
+              <div class="mb-4">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">Rasgos Clave</span>
+                <div class="flex flex-wrap gap-1.5 text-xs text-slate-300">
+                  ${c.traits.map(t => `<span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-[11px]">${t}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800 text-xs text-slate-400">
+              <span class="font-semibold text-slate-300">Estilo:</span> ${c.combatStyle}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const closeBtn = document.getElementById('btn-close-modal');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.closeCharacterModal());
+    }
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        this.closeCharacterModal();
+      }
+    });
   }
 
   bindResultEvents(affinities) {
@@ -633,7 +789,6 @@ class SnkQuizApp {
       });
     }
 
-    // Configurar URLs para compartir en redes
     const shareText = encodeURIComponent(`¡Hice el test de Attack on Titan y soy ${top.name} (${topPercentage}% de afinidad)! ¿Qué personaje de Shingeki no Kyojin sos vos?`);
     const currentUrl = encodeURIComponent(window.location.href);
 
