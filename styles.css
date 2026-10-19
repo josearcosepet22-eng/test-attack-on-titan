@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-bg-base: #0d1117;
+  --color-bg-surface: #151b23;
+  --color-bg-elevated: #1f2733;
+  --color-scout-green: #1d7344;
+  --color-scout-gold: #c69234;
+  --color-scout-crimson: #a82323;
+  --color-parchment: #e6dfcf;
+  --color-muted: #8b949e;
+  --color-border-subtle: rgba(198, 146, 52, 0.2);
+  --color-border-focus: rgba(198, 146, 52, 0.8);
+}
+
+/* Base resets & typography */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg-base);
+  color: #f0f3f6;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(29, 115, 68, 0.18), transparent),
+    radial-gradient(circle at 100% 100%, rgba(198, 146, 52, 0.08), transparent),
+    linear-gradient(to bottom, #090c10, #0d1117 40%, #080a0e);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* Subtle wall texture pattern */
+.bg-wall-texture {
+  background-color: #121720;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Survey Corps frame styling */
+.snk-card {
+  background: rgba(18, 24, 33, 0.88);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(198, 146, 52, 0.25);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.snk-card-interactive {
+  cursor: pointer;
+}
+
+.snk-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(198, 146, 52, 0.55);
+  box-shadow: 0 14px 34px -4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(198, 146, 52, 0.15);
+}
+
+.snk-card-interactive:active {
+  transform: translateY(0);
+}
+
+.snk-card-selected {
+  border-color: #c69234 !important;
+  background: rgba(29, 115, 68, 0.25) !important;
+  box-shadow: 0 0 24px rgba(198, 146, 52, 0.35) !important;
+}
+
+/* Button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #1d7344 0%, #155734 100%);
+  color: #ffffff;
+  border: 1px solid #2ea043;
+  box-shadow: 0 4px 14px rgba(29, 115, 68, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #23864f 0%, #1a6b3f 100%);
+  box-shadow: 0 6px 20px rgba(46, 160, 67, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(30, 41, 59, 0.7);
+  color: #e2e8f0;
+  border: 1px solid rgba(198, 146, 52, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(45, 59, 82, 0.9);
+  border-color: rgba(198, 146, 52, 0.6);
+  color: #ffffff;
+}
+
+/* Gold crest metallic shine */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #f5e0a0 0%, #d4a742 50%, #997321 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Progress bar shimmer */
+.progress-bar-fill {
+  background: linear-gradient(90deg, #1d7344 0%, #2ea043 60%, #c69234 100%);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Accessibility focus rings */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #c69234;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "¿Qué personaje de Attack on Titan sos?",
+  "description": "Test interactivo de personalidad para descubrir con qué héroe de Shingeki no Kyojin te identificas según tus decisiones tácticas, morales y de combate.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
