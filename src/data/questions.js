@@ -1,12 +1,15 @@
 /**
  * Attack on Titan (Shingeki no Kyojin) - Base de preguntas temáticas
  * Cada opción otorga ponderaciones multi-personaje acordes a los dilemas del universo de Isayama.
+ * Cada pregunta incluye un banner cinemático temático para enriquecer la inmersión visual.
  */
 
 export const QUESTIONS = [
   {
     id: 1,
     category: "Filosofía de Vida y Libertad",
+    scenarioTitle: "La Sombra de las Murallas y el Anhelo del Exterior",
+    banner: "/images/wall_sunset.jpg",
     question: "Si hubieras nacido confinado tras las gigantescas murallas, ¿cuál sería tu mayor anhelo?",
     options: [
       {
@@ -38,6 +41,8 @@ export const QUESTIONS = [
   {
     id: 2,
     category: "Liderazgo y Sacrificio en Combate",
+    scenarioTitle: "La Carga de Caballería y las Bengala de Humo",
+    banner: "/images/cavalry_charge.jpg",
     question: "En una emboscada fatal, solo una carga suicida puede abrir una brecha para que la humanidad gane tiempo. ¿Cómo procedes?",
     options: [
       {
@@ -69,6 +74,8 @@ export const QUESTIONS = [
   {
     id: 3,
     category: "Gestión de la Información y la Verdad",
+    scenarioTitle: "El Misterio del Sótano y el Origen de los Titanes",
+    banner: "/images/hange.jpg",
     question: "Capturas vivo a un enemigo portador de secretos cruciales sobre el origen de los titanes. ¿Qué método aplicas?",
     options: [
       {
@@ -100,6 +107,8 @@ export const QUESTIONS = [
   {
     id: 4,
     category: "Reacción ante el Pánico Colectivo",
+    scenarioTitle: "Alarma Roja: Invasión Inesperada en el Distrito",
+    banner: "/images/forest_battle.jpg",
     question: "Una campana de emergencia resuena: una horda de titanes anómalos invadió el distrito comercial. ¿Cuál es tu primera acción?",
     options: [
       {
@@ -131,6 +140,8 @@ export const QUESTIONS = [
   {
     id: 5,
     category: "Vínculos Afectivos y Moral de Equipo",
+    scenarioTitle: "La Fogata Nocturna Previa a la Expedición 57",
+    banner: "/images/night_camp.jpg",
     question: "En una noche gélida previa a la expedición número 57, ¿cómo pasas tus últimas horas en el campamento?",
     options: [
       {
@@ -162,6 +173,8 @@ export const QUESTIONS = [
   {
     id: 6,
     category: "Manejo de la Culpa y la Duda",
+    scenarioTitle: "El Peso del Mando y el Silencio de los Caídos",
+    banner: "/images/levi.jpg",
     question: "Tus decisiones causaron bajas irreparables en tu escuadrón, pero lograron el objetivo militar. ¿Cómo procesas el duelo?",
     options: [
       {
@@ -193,6 +206,8 @@ export const QUESTIONS = [
   {
     id: 7,
     category: "Estilo de Combate Preferido",
+    scenarioTitle: "Vuelo Rasante en el Bosque de Árboles Gigantes",
+    banner: "/images/forest_battle.jpg",
     question: "¿Qué equipamiento o enfoque táctico se adapta mejor a tu personalidad en combate?",
     options: [
       {
@@ -224,6 +239,8 @@ export const QUESTIONS = [
   {
     id: 8,
     category: "Dilema de la Lealtad vs las Órdenes",
+    scenarioTitle: "Insubordinación Moral o Deber Militar",
+    banner: "/images/erwin.jpg",
     question: "El mando militar te ordena ejecutar una directriz que consideras injusta o corrupta. ¿Qué camino tomas?",
     options: [
       {
@@ -255,6 +272,8 @@ export const QUESTIONS = [
   {
     id: 9,
     category: "Motivación Profunda",
+    scenarioTitle: "La Promesa Inquebrantable tras la Tormenta",
+    banner: "/images/hero.jpg",
     question: "¿Qué pensamiento te daría fuerzas para levantarte del suelo cuando tus fuerzas se han agotado por completo?",
     options: [
       {
@@ -286,6 +305,8 @@ export const QUESTIONS = [
   {
     id: 10,
     category: "El Veredicto Final de la Muralla",
+    scenarioTitle: "El Legado Inmortal de las Alas de la Libertad",
+    banner: "/images/cavalry_charge.jpg",
     question: "Al final del día, cuando la historia recuerde a los exploradores de la Legión, ¿cómo deseas ser recordado?",
     options: [
       {

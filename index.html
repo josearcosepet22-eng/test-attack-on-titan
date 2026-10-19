@@ -15,13 +15,17 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="¿Qué personaje de Attack on Titan sos? | Test Shingeki no Kyojin" />
     <meta property="og:description" content="Descubre con qué soldado o comandante del Cuerpo de Exploración te identificas: Eren, Levi, Mikasa, Armin, Erwin, Hange, Reiner o Sasha." />
-    <meta property="og:image" content="/src/assets/images/snk_quiz_hero_1792430580367.jpg" />
+    <meta property="og:image" content="/images/hero.jpg" />
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="¿Qué personaje de Attack on Titan sos? | Test Shingeki no Kyojin" />
     <meta name="twitter:description" content="Enfrenta dilemas morales y decisiones tácticas en el universo de Shingeki no Kyojin para revelar tu personaje afín." />
-    <meta name="twitter:image" content="/src/assets/images/snk_quiz_hero_1792430580367.jpg" />
+    <meta name="twitter:image" content="/images/hero.jpg" />
+
+    <!-- Favicon Oficial: Alas de la Libertad (Cuerpo de Exploración) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.svg" />
 
     <!-- Tipografía Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -37,7 +41,8 @@
             colors: {
               scout: {
                 green: '#1d7344',
-                gold: '#c69234',
+                emerald: '#10b981',
+                bright: '#22c55e',
                 crimson: '#b91c1c',
                 dark: '#0d1117'
               }
@@ -54,39 +59,59 @@
     <!-- Estilos personalizados SnK -->
     <link rel="stylesheet" href="/styles.css" />
   </head>
-  <body class="bg-[#0d1117] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/30 selection:text-amber-200">
+  <body class="bg-[#0d1117] text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-200">
     
     <!-- Barra superior estricta (Top Bar Contract) -->
-    <header class="border-b border-amber-500/20 bg-[#0d1117]/90 backdrop-blur-md sticky top-0 z-50">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-8">
-        <!-- Zona 1: Título de marca (una sola línea) -->
-        <a href="/" class="font-cinzel text-base sm:text-lg font-black tracking-wider text-white whitespace-nowrap shrink-0 flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-[0_0_8px_rgba(198,146,52,0.8)]"></span>
-          <span>SHINGEKI NO KYOJIN</span>
+    <header class="border-b border-emerald-500/25 bg-[#0d1117]/90 backdrop-blur-md sticky top-0 z-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sm:gap-8">
+        <!-- Zona 1: Título de marca con Escudo de las Alas de la Libertad -->
+        <a href="/" class="font-cinzel text-base sm:text-lg font-black tracking-wider text-white whitespace-nowrap shrink-0 flex items-center gap-3 group">
+          <img 
+            src="/favicon.svg" 
+            alt="Alas de la Libertad - Regimiento de Exploración" 
+            class="w-7 h-8 sm:w-8 sm:h-9 object-contain transition-transform group-hover:scale-110 drop-shadow-[0_0_10px_rgba(34,197,94,0.7)]" 
+          />
+          <span class="group-hover:text-emerald-400 transition-colors">SHINGEKI NO KYOJIN</span>
         </a>
 
         <!-- Zona 2: Enlaces informativos / Regimiento -->
         <nav class="hidden md:flex items-center gap-6 text-xs uppercase tracking-widest text-slate-400 font-cinzel">
-          <span class="text-amber-400 font-semibold">Cuerpo de Exploración</span>
+          <span class="text-emerald-400 font-semibold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            Cuerpo de Exploración
+          </span>
           <span aria-hidden="true" class="text-slate-600">·</span>
           <span>Murallas María · Rose · Sina</span>
           <span aria-hidden="true" class="text-slate-600">·</span>
           <span>Test Oficial de Aptitud</span>
         </nav>
 
-        <!-- Zona 3: Acción primaria / Toggle de Sonido FX -->
-        <div class="flex items-center gap-3 shrink-0">
+        <!-- Zona 3: Controles de Audio (Música de fondo y Efectos FX) -->
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <!-- Botón de Música de Fondo -->
+          <button 
+            id="music-toggle-btn" 
+            type="button"
+            aria-label="Alternar música de fondo"
+            class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800/90 border border-emerald-500/40 hover:border-emerald-400 transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+          >
+            <div id="music-icon" class="flex items-center gap-1.5">
+              <span class="text-emerald-400 text-xs font-semibold">♫ Música: OFF</span>
+            </div>
+          </button>
+
+          <!-- Botón de Efectos de Sonido FX -->
           <button 
             id="sound-toggle-btn" 
             type="button"
-            aria-label="Alternar sonido ambiental"
-            class="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 hover:border-amber-500/50 transition-colors flex items-center gap-2 cursor-pointer"
+            aria-label="Alternar efectos sonoros"
+            class="px-2 sm:px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 hover:border-emerald-500/50 transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <div id="sound-icon" class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div id="sound-icon" class="flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
               </svg>
-              <span class="text-xs text-slate-300 font-medium">Sonido: ON</span>
+              <span class="text-[11px] text-slate-300 font-medium hidden sm:inline">FX: ON</span>
             </div>
           </button>
         </div>
@@ -99,18 +124,18 @@
     <!-- Pie de Página Sobrio y Editorial -->
     <footer class="border-t border-slate-800/80 py-8 px-4 text-center text-xs text-slate-500 bg-[#090c10]">
       <div class="max-w-4xl mx-auto space-y-2">
-        <p class="font-cinzel text-slate-400 tracking-wider">
+        <p class="font-cinzel text-emerald-400 font-bold tracking-wider">
           «SHINZOU WO SASAGEYO» · ENTREGUEN SUS CORAZONES
         </p>
         <p>
           Tributo interactivo sin fines de lucro inspirado en la obra original de Hajime Isayama.
         </p>
         <div class="flex items-center justify-center gap-4 text-slate-500 pt-2">
-          <span>Diseño Táctico Militar</span>
+          <span>Diseño Táctico Militar Verde</span>
           <span aria-hidden="true">·</span>
           <span>Deploy en Vercel</span>
           <span aria-hidden="true">·</span>
-          <span>Vanilla ES6+</span>
+          <span>Banda Sonora Integrada</span>
         </div>
       </div>
     </footer>

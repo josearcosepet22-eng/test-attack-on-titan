@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100%" height="100%">
+  <defs>
+    <!-- Filtros de sombra y profundidad -->
+    <filter id="shieldShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <linearGradient id="shieldBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1b2430"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <linearGradient id="scoutGreenBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="50%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#14532d"/>
+    </linearGradient>
+    <linearGradient id="blueWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="whiteWingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Escudo Base de la Legión -->
+  <path d="M 50 5 L 88 18 C 88 65 72 95 50 115 C 28 95 12 65 12 18 Z" 
+        fill="url(#shieldBg)" 
+        stroke="url(#scoutGreenBorder)" 
+        stroke-width="5" 
+        filter="url(#shieldShadow)" />
+
+  <!-- Borde interior fino -->
+  <path d="M 50 10 L 83 22 C 83 62 69 90 50 108 C 31 90 17 62 17 22 Z" 
+        fill="none" 
+        stroke="#22c55e" 
+        stroke-opacity="0.4" 
+        stroke-width="1.5" />
+
+  <!-- Línea divisoria diagonal del blasón -->
+  <line x1="28" y1="28" x2="72" y2="92" stroke="#22c55e" stroke-width="1" stroke-opacity="0.25"/>
+
+  <!-- ALA IZQUIERDA (AZUL - Alas de la Libertad) -->
+  <!-- Plumas superiores e intermedias -->
+  <g fill="url(#blueWingGrad)" stroke="#0f172a" stroke-width="0.75" stroke-linejoin="round">
+    <path d="M 46 22 C 43 28 36 34 31 38 C 36 37 42 35 45 32 Z" />
+    <path d="M 48 30 C 43 38 33 46 24 50 C 31 49 40 45 46 41 Z" />
+    <path d="M 50 39 C 43 49 31 59 21 64 C 29 62 40 56 47 50 Z" />
+    <path d="M 51 49 C 44 60 30 72 20 78 C 29 74 41 67 48 60 Z" />
+    <path d="M 52 59 C 45 71 33 83 23 89 C 32 84 43 76 49 69 Z" />
+    <path d="M 53 69 C 47 79 38 89 31 94 C 38 90 46 84 50 78 Z" />
+  </g>
+
+  <!-- ALA DERECHA (BLANCA - Alas de la Libertad) -->
+  <g fill="url(#whiteWingGrad)" stroke="#475569" stroke-width="0.75" stroke-linejoin="round">
+    <path d="M 54 22 C 57 28 64 34 69 38 C 64 37 58 35 55 32 Z" />
+    <path d="M 52 30 C 57 38 67 46 76 50 C 69 49 60 45 54 41 Z" />
+    <path d="M 50 39 C 57 49 69 59 79 64 C 71 62 60 56 53 50 Z" />
+    <path d="M 49 49 C 56 60 70 72 80 78 C 71 74 59 67 52 60 Z" />
+    <path d="M 48 59 C 55 71 67 83 77 89 C 68 84 57 76 51 69 Z" />
+    <path d="M 47 69 C 53 79 62 89 69 94 C 62 90 54 84 50 78 Z" />
+  </g>
+
+  <!-- Centro cruzado distintivo -->
+  <polygon points="50,35 53,42 50,49 47,42" fill="#ffffff" stroke="#2563eb" stroke-width="0.8"/>
+  <polygon points="50,52 53,59 50,66 47,59" fill="#2563eb" stroke="#ffffff" stroke-width="0.8"/>
+  <polygon points="50,69 53,76 50,83 47,76" fill="#ffffff" stroke="#2563eb" stroke-width="0.8"/>
+</svg>
